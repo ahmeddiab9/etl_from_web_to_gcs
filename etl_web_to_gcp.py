@@ -1,5 +1,6 @@
 from pathlib import Path
 import pandas as pd
+import pyarrow.parquet as pq
 from prefect import flow , task
 from prefect_gcp.cloud_storage import GcsBucket
 
@@ -23,7 +24,10 @@ def clean(df = pd.DataFrame) -> pd.DataFrame:
 @task()
 def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
     """Write dataframe out locally as parquet file"""
-    path = Path(rf'/data/yellowr/yellow_tripdata_2021-02.parquet')
+    title = color
+    path = Path("data/yellow")
+    path.mkdir(parents=True, exist_ok=True)
+    (path/f"{title}/{dataset_file}.parquet")
     df.to_parquet(path , compression='gzip')
     return path
 
