@@ -10,7 +10,7 @@ from prefect.filesystems import  S3
 def fetch(dataste_url : str) -> pd.DataFrame:
     """Read data from web into pandas"""
     df = pd.read_csv(dataste_url)
-    return df
+    return df 
      
 
 @task(log_prints=True)
