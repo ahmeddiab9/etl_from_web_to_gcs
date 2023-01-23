@@ -1,8 +1,9 @@
 from pathlib import Path
 import pandas as pd
-import pyarrow.parquet as pq
+import pyarrow
 from prefect import flow , task
 from prefect_gcp.cloud_storage import GcsBucket
+from prefect.filesystems import  S3
 
 
 @task(retries=3)
@@ -24,12 +25,17 @@ def clean(df = pd.DataFrame) -> pd.DataFrame:
 @task()
 def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
     """Write dataframe out locally as parquet file"""
-    title = color
-    path = Path("data/yellow")
-    path.mkdir(parents=True, exist_ok=True)
-    (path/f"{title}/{dataset_file}.parquet")
-    df.to_parquet(path , compression='gzip')
+    path = Path(f'data/{color}/{dataset_file}.parquet')
+    df.to_parquet(path ,engine='pyarrow' ,compression='gzip')
     return path
+
+@task()
+def write_to_s3(path:Path) -> None:
+    """Upload local parquet file to gcs"""
+    s3_block =  S3.load("etl-s3")
+    s3_block.put_directory(path, path)
+    return
+
 
 @flow()
 def etl_web_to_gcs() -> None:
@@ -43,7 +49,7 @@ def etl_web_to_gcs() -> None:
     df = fetch(dataset_url)
     df_clean = clean(df)
     path = write_local(df_clean , color , dataset_file)
-
+    write_to_s3(path)
 
 if __name__ == '__main__':
     etl_web_to_gcs() 
