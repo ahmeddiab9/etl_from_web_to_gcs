@@ -33,8 +33,8 @@ def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
 def write_to_s3(path:Path) -> None:
     """Upload local parquet file to gcs"""
     s3_block =  S3.load("etl-s3")
-    s3_block.put_directory(path, path)
-    return
+    s3_block.put_directory(f"{path}", path)
+    return 
 
 
 @flow()
