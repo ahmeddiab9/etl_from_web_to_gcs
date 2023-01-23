@@ -3,7 +3,10 @@ import pandas as pd
 import pyarrow
 from prefect import flow , task
 from prefect_gcp.cloud_storage import GcsBucket
-from prefect.filesystems import  S3
+from prefect.filesystems import S3
+from prefect_aws.s3 import S3Bucket
+import os
+from prefect_aws import AwsCredentials
 
 
 @task(retries=3)
@@ -29,12 +32,14 @@ def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
     df.to_parquet(path ,engine='pyarrow' ,compression='gzip')
     return path
 
-@task()
-def write_to_s3(path:Path) -> None:
+@task(log_prints=True)
+def write_to_s3(path:Path):
     """Upload local parquet file to gcs"""
-    s3_block =  S3.load("etl-s3")
-    s3_block.put_directory(f"{path}", path)
-    return 
+    s3_block = S3.load("etl-prefect")
+    s3_block.put_directory(local_path=rf"{path}" , to_path="yellow_tripdata_2021-01.parquet")
+    print ("Upload local parquet file to S3...")
+    print (s3_block)
+    return path
 
 
 @flow()
@@ -50,6 +55,6 @@ def etl_web_to_gcs() -> None:
     df_clean = clean(df)
     path = write_local(df_clean , color , dataset_file)
     write_to_s3(path)
-
+    
 if __name__ == '__main__':
     etl_web_to_gcs() 
