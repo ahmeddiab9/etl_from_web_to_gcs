@@ -1,8 +1,12 @@
 pandas == 1.5.2
 prefect == 2.7.7
 prefect-sqlalchemy==0.2.2
-prefect-gcp[cloud_storage]==0.2.3
 prefect-aws == 0.2.3
 protobuf==4.21.11
 pyarrow==10.0.1
 pandas-gbq==0.18.1
+red-panda == 1.0.2
+SQLAlchemy == 1.4.46
+pandas-redshift == 2.0.5
+s3fs == 2023.1.0
+redshift-connector == 2.0.909

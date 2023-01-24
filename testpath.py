@@ -1,7 +1,5 @@
-from pathlib import Path
+import pandas as pd
 
-title = 'A'
-raw_text = 'Ahmed'
-text_path = Path("random/results").resolve()
-text_path.mkdir(parents=True, exist_ok=True)
-(text_path / f"{title}.txt").write_text(raw_text)
+
+df = pd.read_parquet("data/yellow/yellow_tripdata_2021-01.parquet")
+print(df.head())

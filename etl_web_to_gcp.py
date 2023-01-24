@@ -1,9 +1,11 @@
+# prefect orion start
 from pathlib import Path
 import pandas as pd
 import pyarrow
 from prefect import flow , task
 from prefect_gcp.cloud_storage import GcsBucket
 from prefect.filesystems import  S3
+from prefect_aws.s3 import S3Bucket
 
 
 @task(retries=3)
@@ -29,11 +31,13 @@ def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
     df.to_parquet(path ,engine='pyarrow' ,compression='gzip')
     return path
 
-@task()
+@task(log_prints=True)
+# aws Access key => AKIATYWOATBH4UM7NYWB
+# aws secretkey => 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
 def write_to_s3(path:Path) -> None:
     """Upload local parquet file to gcs"""
-    s3_block =  S3.load("etl-s3")
-    s3_block.put_directory(f"{path}", path)
+    s3_bucket_block = S3Bucket.load("etl-from-web-to-s3")
+    s3_bucket_block.upload_from_path(path, 'data/yellow/yellow_tripdata_2021-01.parquet')
     return 
 
 
