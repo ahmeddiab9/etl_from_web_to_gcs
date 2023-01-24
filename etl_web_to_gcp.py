@@ -54,6 +54,6 @@ def etl_web_to_gcs() -> None:
     df_clean = clean(df)
     path = write_local(df_clean , color , dataset_file)
     write_to_s3(path)
-
+    
 if __name__ == '__main__':
     etl_web_to_gcs() 
