@@ -10,3 +10,6 @@ SQLAlchemy == 1.4.46
 pandas-redshift == 2.0.5
 s3fs == 2023.1.0
 redshift-connector == 2.0.909
+pandas-amazon-redshift == 0.1.1
+# https://datageeks.medium.com/import-aws-redshift-data-into-pandas-dataframe-1d1857e9a251
+# https://itnext.io/how-to-call-rest-apis-with-pandas-and-store-the-results-in-redshift-2b35f40aa98f
