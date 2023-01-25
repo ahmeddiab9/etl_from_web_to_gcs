@@ -1,6 +1,7 @@
 # prefect orion start
 from pathlib import Path
 import pandas as pd
+import psycopg2
 from prefect import flow , task
 from prefect_aws.s3 import S3Bucket
 from prefect_aws import AwsCredentials
@@ -16,7 +17,7 @@ from sqlalchemy import create_engine
 @task()
 def extract_from_redshift(color:str , year:int , month:int) -> pd.DataFrame:
     s3_path = f"data/{color}/{color}_tripdata_{year}-{month:02}.parquet"
-    s3_bucket_block = S3Bucket.load("etl-from-web-to-s3")
+    s3_bucket_block = S3Bucket.load("etl-s3-bucket")
     s3_bucket_block.get_directory()
     return Path(s3_path)
 
@@ -36,6 +37,12 @@ def write_redshift(df : pd.DataFrame) -> None:
     """Write data to Redshift"""
     #name_space etl-from-s3-zoom
     # https://stackoverflow.com/questions/38402995/how-to-write-data-to-redshift-that-is-a-result-of-a-dataframe-created-in-python
+    conn = create_engine('postgresql+psycopg2://awsuser:Admin123@redshift-cluster-1.cltns8ijhpx4.us-east-1.redshift.amazonaws.com:5439/dev')
+    df.to_sql('rides', conn, index=False, if_exists='replace' , chunksize = 100000)
+    print('successfully insert to redshift')
+
+
+
 
 @flow()
 def etl_ws3_to_redshift() -> None:
