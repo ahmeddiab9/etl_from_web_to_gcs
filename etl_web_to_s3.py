@@ -31,11 +31,6 @@ def write_local(df : pd.DataFrame , color : str , dataset_file:str) -> Path:
     return path
 
 @task(log_prints=True)
-# aws Access key => AKIATYWOATBH4UM7NYWB
-# aws secretkey => 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
-
-# aws Access key => AKIATYWOATBHT72LB3UC
-# aws secretkey => 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
  
 def write_to_s3(path:Path) -> None:
     """Upload local parquet file to s3"""
